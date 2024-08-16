@@ -5,7 +5,6 @@ with open("TrainningData/the-verdict.txt", "r", encoding="utf-8") as f:
 
 preprocessed = re.split(r'([,.:;?_!"()\']|--|\s)', raw_text)
 preprocessed = [item for item in preprocessed if item.strip()]
-
 all_words = sorted(set(preprocessed))
 vocab = {token:i for i,token in enumerate(all_words)}
 
@@ -21,6 +20,12 @@ class SimpleTokenizerV1:
         return ids
     
     def decode(self, ids):
-        text = "".join([self.int_to_str[i] for i in ids])
+        text = " ".join([self.int_to_str[i] for i in ids])
         text = re.sub(r'\s+([,.?!"()\'])', r'\1', text)
         return text
+    
+tokenizer = SimpleTokenizerV1(vocab)
+text = """"It's the last he painted, you know," Mrs. Gisburn said with pardonable pride."""
+ids = tokenizer.encode(text)
+print(ids)
+print(tokenizer.decode(ids))
