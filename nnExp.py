@@ -22,7 +22,7 @@ class NeuralNetwork(torch.nn.Module):
         logits = self.layers(x)
         return logits
 
-# torch.manual_seed(123) 
+torch.manual_seed(123) 
 model = NeuralNetwork(50, 3)
 print(model)
 
@@ -32,3 +32,12 @@ print("Total number of trainable model parameters:", num_params)
 print(model.layers[0].weight)
 print(model.layers[0].weight.shape)
 print(model.layers[0].bias)
+
+
+torch.manual_seed(123)
+X = torch.rand((1, 50))
+
+
+with torch.no_grad():
+    out = torch.softmax(model(X), dim=1)
+print(out)
