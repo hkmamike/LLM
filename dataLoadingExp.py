@@ -1,5 +1,6 @@
 import torch
-
+from torch.utils.data import Dataset
+ 
 X_train = torch.tensor([
     [-1.2, 3.1],
     [-0.9, 2.9],
@@ -14,3 +15,22 @@ X_test = torch.tensor([
     [2.6, -1.6],
 ])
 y_test = torch.tensor([0, 1])
+
+
+class ToyDataset(Dataset):
+    def __init__(self, X, y):
+        self.features = X
+        self.labels = y
+ 
+    def __getitem__(self, index):
+        one_x = self.features[index]
+        one_y = self.labels[index]
+        return one_x, one_y
+ 
+    def __len__(self):
+        return self.labels.shape[0]
+ 
+train_ds = ToyDataset(X_train, y_train)
+test_ds = ToyDataset(X_test, y_test)
+
+print(len(train_ds))
