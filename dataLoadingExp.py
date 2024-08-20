@@ -33,11 +33,13 @@ y_test = torch.tensor([0, 1])
 train_ds = ToyDataset(X_train, y_train)
 test_ds = ToyDataset(X_test, y_test)
  
+torch.manual_seed(123)
 train_loader = DataLoader(
     dataset=train_ds,
     batch_size=2,
     shuffle=True,
-    num_workers=0
+    num_workers=0,
+    drop_last=True
 )
 
 for idx, (x, y) in enumerate(train_loader):
