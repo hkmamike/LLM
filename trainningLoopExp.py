@@ -57,9 +57,6 @@ train_loader = DataLoader(
     drop_last=True
 )
 
-
-
-
 model = NeuralNetwork(num_inputs=2, num_outputs=2)
 optimizer = torch.optim.SGD(model.parameters(), lr=0.5)
 num_epochs = 3
@@ -85,11 +82,31 @@ for epoch in range(num_epochs):
 model.eval()
 with torch.no_grad():
     outputs = model(X_train)
-print(outputs)
 
 torch.set_printoptions(sci_mode=False)
 probas = torch.softmax(outputs, dim=1)
-print(probas)
 predictions = torch.argmax(outputs, dim=1)
+print(probas)
 print(predictions)
 print(torch.sum(predictions == y_train))
+
+
+def compute_accuracy(model, dataloader):
+ 
+    model = model.eval()
+    correct = 0.0
+    total_examples = 0
+    
+    for idx, (features, labels) in enumerate(dataloader):
+        
+        with torch.no_grad():
+            logits = model(features)
+        
+        predictions = torch.argmax(logits, dim=1)
+        compare = labels == predictions
+        correct += torch.sum(compare)
+        total_examples += len(compare)
+ 
+    return (correct / total_examples).item()
+
+print(compute_accuracy(model, train_loader))
