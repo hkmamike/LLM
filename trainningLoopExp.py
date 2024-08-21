@@ -47,10 +47,25 @@ X_train = torch.tensor([
 ])
 y_train = torch.tensor([0, 0, 0, 1, 1])
 train_ds = ToyDataset(X_train, y_train)
- 
+
+
+X_test = torch.tensor([
+    [-0.8, 2.8],
+    [2.6, -1.6],
+])
+y_test = torch.tensor([0, 1])
+test_ds = ToyDataset(X_test, y_test)
+
 torch.manual_seed(123)
 train_loader = DataLoader(
     dataset=train_ds,
+    batch_size=2,
+    shuffle=True,
+    num_workers=0,
+    drop_last=True
+)
+test_loader = DataLoader(
+    dataset=test_ds,
     batch_size=2,
     shuffle=True,
     num_workers=0,
@@ -110,3 +125,6 @@ def compute_accuracy(model, dataloader):
     return (correct / total_examples).item()
 
 print(compute_accuracy(model, train_loader))
+print(compute_accuracy(model, test_loader))
+
+torch.save(model.state_dict(), "model.pth")
