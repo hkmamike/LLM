@@ -73,6 +73,10 @@ test_loader = DataLoader(
 )
 
 model = NeuralNetwork(num_inputs=2, num_outputs=2)
+
+device = torch.device("cuda")
+model = model.to(device)
+
 optimizer = torch.optim.SGD(model.parameters(), lr=0.5)
 num_epochs = 3
  
@@ -81,8 +85,8 @@ for epoch in range(num_epochs):
     model.train()
     for batch_idx, (features, labels) in enumerate(train_loader):
  
+        features, labels = features.to(device), labels.to(device)
         logits = model(features)
-        
         loss = F.cross_entropy(logits, labels)
         
         optimizer.zero_grad()
@@ -128,3 +132,7 @@ print(compute_accuracy(model, train_loader))
 print(compute_accuracy(model, test_loader))
 
 torch.save(model.state_dict(), "model.pth")
+
+# loading model
+# model = NeuralNetwork(2, 2) 
+# model.load_state_dict(torch.load("model.pth"))
