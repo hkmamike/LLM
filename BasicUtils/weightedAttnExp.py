@@ -20,7 +20,18 @@ W_query = torch.nn.Parameter(torch.rand(d_in, d_out), requires_grad=False)
 W_key   = torch.nn.Parameter(torch.rand(d_in, d_out), requires_grad=False)
 W_value = torch.nn.Parameter(torch.rand(d_in, d_out), requires_grad=False)
 
+print("W_query: ", W_query)
+
 query_2 = x_2 @ W_query 
 key_2 = x_2 @ W_key 
 value_2 = x_2 @ W_value
 print(query_2)
+
+keys = inputs @ W_key 
+values = inputs @ W_value
+print("keys.shape: ", keys.shape)
+print("values.shape: ", values.shape)
+
+keys_2 = keys[1]
+attn_score_22 = query_2.dot(keys_2)
+print(attn_score_22)
