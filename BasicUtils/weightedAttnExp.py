@@ -25,13 +25,16 @@ print("W_query: ", W_query)
 query_2 = x_2 @ W_query 
 key_2 = x_2 @ W_key 
 value_2 = x_2 @ W_value
-print(query_2)
+print("query 2: ", query_2)
 
 keys = inputs @ W_key 
 values = inputs @ W_value
-print("keys.shape: ", keys.shape)
-print("values.shape: ", values.shape)
+attn_scores_2 = query_2 @ keys.T # All attention scores for given query
+print("attn scores 2: ", attn_scores_2)
 
-keys_2 = keys[1]
-attn_score_22 = query_2.dot(keys_2)
-print(attn_score_22)
+d_k = keys.shape[-1]
+attn_weights_2 = torch.softmax(attn_scores_2 / d_k**0.5, dim=-1)
+print("attn weights 2: ", attn_weights_2)
+
+context_vec_2 = attn_weights_2 @ values
+print(context_vec_2)
