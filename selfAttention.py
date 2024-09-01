@@ -59,3 +59,32 @@ class SelfAttention_v2(nn.Module):
 torch.manual_seed(789)
 sa_v2 = SelfAttention_v2(d_in, d_out)
 print(sa_v2(inputs))
+
+# trying masked attention
+queries = sa_v2.W_query(inputs)
+keys = sa_v2.W_key(inputs)
+attn_scores = queries @ keys.T
+attn_weights = torch.softmax(attn_scores / keys.shape[-1]**0.5, dim=1)
+print(attn_weights)
+
+# tril extracts lower triangular part
+masked_simple = torch.tril(attn_weights)
+print(masked_simple)
+
+row_sums = masked_simple.sum(dim=1, keepdim=True)
+masked_simple_norm = masked_simple / row_sums
+print(masked_simple_norm)
+
+context_length = attn_scores.shape[0]
+mask = torch.triu(torch.ones(context_length, context_length), diagonal=1)
+masked = attn_scores.masked_fill(mask.bool(), -torch.inf)
+print(masked)
+
+attn_weights = torch.softmax(masked / keys.shape[-1]**0.5, dim=1)
+print(attn_weights)
+
+#drop out mask
+torch.manual_seed(123)
+dropout = torch.nn.Dropout(0.5)
+example = torch.ones(6, 6)
+print(dropout(example))
