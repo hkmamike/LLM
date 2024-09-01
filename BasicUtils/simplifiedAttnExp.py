@@ -42,3 +42,7 @@ print(attn_weights)
 row_2_sum = sum([0.1385, 0.2379, 0.2333, 0.1240, 0.1082, 0.1581])
 print("Row 2 sum:", row_2_sum)
 print("All row sums:", attn_weights.sum(dim=-1))
+
+all_context_vecs = attn_weights @ inputs
+print(all_context_vecs)
+print("Previous 2nd context vector:", context_vec_2)
