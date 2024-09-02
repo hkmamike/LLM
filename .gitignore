@@ -1,5 +1,6 @@
 gpt2/
 __pycache__**
-__pycache__\
+__pycache__\**
 TrainningData/
 **.pth
+__pycache__/dataset.cpython-311.pyc
