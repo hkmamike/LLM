@@ -177,20 +177,47 @@ def softmax_with_temperature(logits, temperature):
     scaled_logits = logits / temperature
     return torch.softmax(scaled_logits, dim=0)
 
-next_token_logits = torch.tensor(
-    [4.51, 0.89, -1.90, 6.75, 1.63, -1.62, -1.89, 6.28, 1.79]
-)
+# next_token_logits = torch.tensor(
+#     [4.51, 0.89, -1.90, 6.75, 1.63, -1.62, -1.89, 6.28, 1.79]
+# )
 
-top_k = 3
-top_logits, top_pos = torch.topk(next_token_logits, top_k)
-print("Top logits:", top_logits)
-print("Top positions:", top_pos)
+# top_k = 3
+# top_logits, top_pos = torch.topk(next_token_logits, top_k)
+# print("Top logits:", top_logits)
+# print("Top positions:", top_pos)
 
-new_logits = torch.where(
-    condition=next_token_logits < top_logits[-1],
-    input=torch.tensor(float('-inf')),
-    other=next_token_logits
-)
-print(new_logits)
-topk_probas = torch.softmax(new_logits, dim=0)
-print(topk_probas)
+# new_logits = torch.where(
+#     condition=next_token_logits < top_logits[-1],
+#     input=torch.tensor(float('-inf')),
+#     other=next_token_logits
+# )
+# print(new_logits)
+# topk_probas = torch.softmax(new_logits, dim=0)
+# print(topk_probas)
+
+# generate text with optional temperature and top-k settings
+def generate(model, idx, max_new_tokens, context_size,
+             temperature=1.0, top_k=None, eos_id=None):
+    for _ in range(max_new_tokens):
+        idx_cond = idx[:, -context_size:]
+        with torch.no_grad():
+            logits = model(idx_cond)
+        logits = logits[:, -1, :]
+        if top_k is not None:
+            top_logits, _ = torch.topk(logits, top_k)
+            min_val = top_logits[:, -1]
+            logits = torch.where(
+                logits < min_val,
+                torch.tensor(float('-inf')).to(logits.device),
+                logits
+            )
+        if temperature > 0.0:
+                logits = logits / temperature
+                probs = torch.softmax(logits, dim=-1)
+                idx_next = torch.multinomial(probs, num_samples=1)
+        else:
+            idx_next = torch.argmax(logits, dim=-1, keepdim=True)
+            if idx_next == eos_id:
+                break
+            idx = torch.cat((idx, idx_next), dim=1)
+    return idx
