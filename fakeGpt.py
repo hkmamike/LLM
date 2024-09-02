@@ -116,13 +116,59 @@ model = GPTModel(GPT_CONFIG_124M)
 
 import tiktoken
 tokenizer = tiktoken.get_encoding("gpt2")
-batch = []
-txt1 = "Every effort moves you"
-txt2 = "Every day holds a"
-batch.append(torch.tensor(tokenizer.encode(txt1)))
-batch.append(torch.tensor(tokenizer.encode(txt2)))
-batch = torch.stack(batch, dim=0)
-out = model(batch)
-print("Input batch:\n", batch)
-print("\nOutput shape:", out.shape)
-print(out)
+# batch = []
+# txt1 = "Every effort moves you"
+# txt2 = "Every day holds a"
+# batch.append(torch.tensor(tokenizer.encode(txt1)))
+# batch.append(torch.tensor(tokenizer.encode(txt2)))
+# batch = torch.stack(batch, dim=0)
+# out = model(batch)
+# print("Input batch:\n", batch)
+# print("\nOutput shape:", out.shape)
+# print(out)
+
+# total_params = sum(p.numel() for p in model.parameters())
+# print(f"Total number of parameters: {total_params:,}")
+
+# print("Token embedding layer shape:", model.tok_emb.weight.shape)
+# print("Output layer shape:", model.out_head.weight.shape)
+
+# total_params_gpt2 =  total_params - sum(p.numel() for p in model.out_head.parameters())
+# print(f"Number of trainable parameters considering weight tying: {total_params_gpt2:,}")
+
+# total_size_bytes = total_params * 4
+# total_size_mb = total_size_bytes / (1024 * 1024)
+# print(f"Total size of the model: {total_size_mb:.2f} MB")
+
+def generate_text_simple(model, idx, max_new_tokens, context_size):
+    for _ in range(max_new_tokens):
+        idx_cond = idx[:, -context_size:]
+        with torch.no_grad():
+            logits = model(idx_cond)
+       
+        logits = logits[:, -1, :]
+        probas = torch.softmax(logits, dim=-1) # maybe not needed
+        idx_next = torch.argmax(probas, dim=-1, keepdim=True)
+        idx = torch.cat((idx, idx_next), dim=1)
+ 
+    return idx
+
+start_context = "Hello, I am"
+encoded = tokenizer.encode(start_context)
+print("encoded:", encoded)
+encoded_tensor = torch.tensor(encoded).unsqueeze(0)
+print("encoded_tensor.shape:", encoded_tensor.shape)
+
+model.eval() #disable dropout and backprop
+
+out = generate_text_simple(
+    model=model,
+    idx=encoded_tensor, 
+    max_new_tokens=6, 
+    context_size=GPT_CONFIG_124M["context_length"]
+)
+print("Output:", out)
+print("Output length:", len(out[0]))
+
+decoded_text = tokenizer.decode(out.squeeze(0).tolist())
+print(decoded_text)
