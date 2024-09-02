@@ -221,3 +221,13 @@ def generate(model, idx, max_new_tokens, context_size,
                 break
             idx = torch.cat((idx, idx_next), dim=1)
     return idx
+
+token_ids = generate(
+    model=model,
+    idx=text_to_token_ids("Every effort moves you", tokenizer).to(device),
+    max_new_tokens=15,
+    context_size=GPT_CONFIG_124M["context_length"],
+    top_k=25,
+    temperature=1.4
+)
+print("Output text:\n", token_ids_to_text(token_ids, tokenizer))
