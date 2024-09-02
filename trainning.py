@@ -18,7 +18,9 @@ GPT_CONFIG_124M = {
     "qkv_bias": False
 }
 model = GPTModel(GPT_CONFIG_124M)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cpu")
+device = torch.device("cuda")
 
 def text_to_token_ids(text, tokenizer):
     encoded = tokenizer.encode(text, allowed_special={'<|endoftext|>'})
@@ -152,14 +154,14 @@ def train_model_simple(model, train_loader, val_loader, optimizer, device, num_e
         )
     return train_losses, val_losses, track_tokens_seen
 
-# model.to(device)
-# optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)
-# num_epochs = 10
-# train_losses, val_losses, tokens_seen = train_model_simple(
-#     model, train_loader, val_loader, optimizer, device,
-#     num_epochs=num_epochs, eval_freq=5, eval_iter=1,
-#     start_context="Every effort moves you", tokenizer=tokenizer
-# )
+model.to(device)
+optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)
+num_epochs = 10
+train_losses, val_losses, tokens_seen = train_model_simple(
+    model, train_loader, val_loader, optimizer, device,
+    num_epochs=num_epochs, eval_freq=5, eval_iter=1,
+    start_context="Every effort moves you", tokenizer=tokenizer
+)
 
 # model.to("cpu")
 # model.eval()
@@ -222,12 +224,26 @@ def generate(model, idx, max_new_tokens, context_size,
             idx = torch.cat((idx, idx_next), dim=1)
     return idx
 
-token_ids = generate(
-    model=model,
-    idx=text_to_token_ids("Every effort moves you", tokenizer).to(device),
-    max_new_tokens=15,
-    context_size=GPT_CONFIG_124M["context_length"],
-    top_k=25,
-    temperature=1.4
+# token_ids = generate(
+#     model=model,
+#     idx=text_to_token_ids("Every effort moves you", tokenizer).to(device),
+#     max_new_tokens=15,
+#     context_size=GPT_CONFIG_124M["context_length"],
+#     top_k=25,
+#     temperature=1.4
+# )
+# print("Output text:\n", token_ids_to_text(token_ids, tokenizer))
+
+torch.save(model.state_dict(), "model.pth")
+torch.save({
+    "model_state_dict": model.state_dict(),
+    "optimizer_state_dict": optimizer.state_dict(),
+    }, 
+    "model_and_optimizer.pth"
 )
-print("Output text:\n", token_ids_to_text(token_ids, tokenizer))
+# checkpoint = torch.load("model_and_optimizer.pth")
+# model = GPTModel(GPT_CONFIG_124M)
+# model.load_state_dict(checkpoint["model_state_dict"])
+# optimizer = torch.optim.AdamW(model.parameters(), lr=5e-4, weight_decay=0.1)
+# optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+# model.train()
