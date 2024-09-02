@@ -1,5 +1,9 @@
 # Download GPT2 pretrainned weights to skip over the real foundational model trainning step.
+
 # Copyright (c) Sebastian Raschka under Apache License 2.0 (see LICENSE.txt).
+# Source for "Build a Large Language Model From Scratch"
+#   - https://www.manning.com/books/build-a-large-language-model-from-scratch
+# Code: https://github.com/rasbt/LLMs-from-scratch
 
 
 import os
@@ -138,9 +142,3 @@ def load_gpt2_params_from_tf_ckpt(ckpt_path, settings):
         target_dict[last_key] = variable_array
 
     return params
-
-from gpt_download import download_and_load_gpt2
-settings, params = download_and_load_gpt2(model_size="124M", models_dir="gpt2")
-
-print("Settings:", settings)
-print("Parameter dictionary keys:", params.keys())
