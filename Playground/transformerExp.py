@@ -138,16 +138,16 @@ def print_gradients(model, x):
             # Print the mean absolute gradient of the weights
             print(f"{name} has gradient mean of {param.grad.abs().mean().item()}")
 
-layer_sizes = [3, 3, 3, 3, 3, 1]  
-sample_input = torch.tensor([[1., 0., -1.]])
-torch.manual_seed(123) # specify random seed for the initial weights for reproducibility
-model_without_shortcut = ExampleDeepNeuralNetwork(
-    layer_sizes, use_shortcut=False
-)
-print_gradients(model_without_shortcut, sample_input)
+# layer_sizes = [3, 3, 3, 3, 3, 1]  
+# sample_input = torch.tensor([[1., 0., -1.]])
+# torch.manual_seed(123) # specify random seed for the initial weights for reproducibility
+# model_without_shortcut = ExampleDeepNeuralNetwork(
+#     layer_sizes, use_shortcut=False
+# )
+# print_gradients(model_without_shortcut, sample_input)
 
-torch.manual_seed(123)
-model_with_shortcut = ExampleDeepNeuralNetwork(
-    layer_sizes, use_shortcut=True
-)
-print_gradients(model_with_shortcut, sample_input)
+# torch.manual_seed(123)
+# model_with_shortcut = ExampleDeepNeuralNetwork(
+#     layer_sizes, use_shortcut=True
+# )
+# print_gradients(model_with_shortcut, sample_input)
